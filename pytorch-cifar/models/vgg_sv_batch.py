@@ -30,7 +30,7 @@ class SV_BatchNorm2d(nn.BatchNorm2d):
             var = (input - mean).pow(2).mean(dim=(2,3),keepdim=True)
             mean = mean.squeeze()
             var = var.squeeze()
-            print('variance size:', var.size())
+
             n = input.numel() / (input.size(1) * input.size(0))
             # self.total = self.total + 1
             # if n==4 and self.total %300 == 1 :

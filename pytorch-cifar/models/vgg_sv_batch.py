@@ -24,10 +24,10 @@ class SV_BatchNorm2d(nn.BatchNorm2d):
 
         # calculate running estimates
         if self.training:
-            mean = input.mean(dim=(2,3),keepdim=True)
+            mean = input.mean(dim=(0,2,3),keepdim=True)
             # print('mean size:', mean.size())
             # use biased var in train
-            var = (input - mean).pow(2).mean(dim=(0,2,3),keepdim=True)
+            var = (input - mean).pow(2).mean(dim=(2,3),keepdim=True)
             mean = mean.squeeze()
             var = var.squeeze()
             # print('variance size:', var.size())
@@ -44,7 +44,7 @@ class SV_BatchNorm2d(nn.BatchNorm2d):
                 self.running_mean = exponential_average_factor * mean.mean(dim=0)\
                     + (1 - exponential_average_factor) * self.running_mean
                 # update running_var with unbiased var
-                self.running_var = exponential_average_factor * var\
+                self.running_var = exponential_average_factor * var* n / (n - 1)\
                     +(1 - exponential_average_factor) * self.running_var
                 # for i in range(var.size(0)):
                 #     self.running_var = exponential_average_factor * var[i] * n / (n - 1)\

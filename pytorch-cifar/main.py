@@ -7,7 +7,7 @@ import torch.backends.cudnn as cudnn
 
 import torchvision
 import torchvision.transforms as transforms
-
+import math
 import os
 import argparse
 
@@ -21,6 +21,8 @@ parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
 parser.add_argument('--resume', '-r', action='store_true', help='resume from checkpoint')
 parser.add_argument('--dir', type=str, help='root dir')
 parser.add_argument('--method', type=str, help='batch normal')
+parser.add_argument('--schedule', type=int, nargs='+', default=[25,50,75],
+                        help='Decrease learning rate at these epochs.')
 args = parser.parse_args()
 
 os.makedirs(args.dir, exist_ok=True)
@@ -174,8 +176,20 @@ def test(epoch):
 
         
         
+def adjust_learning_rate(optimizer, epoch):
+    lr_max = args.lr
+    lr = args.lr
+    if epoch <= args.ramp_up:
+        lr = lr_max*(1 - math.cos(epoch/(10)*math.pi))
+        for param_group in optimizer.param_groups:
+            param_group['lr'] = lr
+
+    elif epoch in args.schedule:
+        lr *= 0.1
+    print("lr:",lr)
 
 for epoch in range(start_epoch, start_epoch+50):
+    adjust_learning_rate(optimizer,epoch)
     train(epoch)
     test(epoch)
 #     scheduler.step()

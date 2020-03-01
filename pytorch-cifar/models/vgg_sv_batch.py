@@ -23,13 +23,16 @@ class SV_BatchNorm2d(nn.BatchNorm2d):
 
         # calculate running estimates
         if self.training:
-            mean = input.mean([0, 2, 3])
+            mean = input.mean(dim=(0,2,3),keepdim=True)
             # print('mean size:', mean.size())
             # use biased var in train
-            var = torch.var(input,[2, 3], unbiased=False)
+            var = (input - mean).pow(2).mean(dim=(2,3),keepdim=True)
+            mean = mean.squeeze()
+            var = var.squeeze()
             # print('variance size:', var.size())
             n = input.numel() / (input.size(1) * input.size(0))
-            print("n:",n)
+
+            # print("n:",n)
             with torch.no_grad():
                 self.running_mean = exponential_average_factor * mean\
                     + (1 - exponential_average_factor) * self.running_mean

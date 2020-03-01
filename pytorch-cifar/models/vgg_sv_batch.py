@@ -29,6 +29,7 @@ class SV_BatchNorm2d(nn.BatchNorm2d):
             var = input.var([2, 3], unbiased=False)
             # print('variance size:', var.size())
             n = input.numel() / (input.size(1) * input.size(0))
+            print("n:",n)
             with torch.no_grad():
                 self.running_mean = exponential_average_factor * mean\
                     + (1 - exponential_average_factor) * self.running_mean

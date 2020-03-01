@@ -180,7 +180,7 @@ def adjust_learning_rate(optimizer, epoch):
     lr_max = args.lr
     lr = args.lr
     if epoch <= 10:
-        lr = 0.0001 + lr_max*(1 - math.cos(epoch/(10)*math.pi))
+        lr = 0.0001 + 0.5*lr_max*(1 - math.cos(epoch/(10)*math.pi))
         for param_group in optimizer.param_groups:
             param_group['lr'] = lr
 

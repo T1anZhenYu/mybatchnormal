@@ -179,7 +179,7 @@ def test(epoch):
 def adjust_learning_rate(optimizer, epoch):
     lr_max = args.lr
     lr = args.lr
-    if epoch <= args.ramp_up:
+    if epoch <= 10:
         lr = lr_max*(1 - math.cos(epoch/(10)*math.pi))
         for param_group in optimizer.param_groups:
             param_group['lr'] = lr

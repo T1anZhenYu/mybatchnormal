@@ -186,6 +186,10 @@ def adjust_learning_rate(optimizer, epoch):
 
     elif epoch in args.schedule:
         lr *= 0.1
+    if args.resume:
+        for param_group in optimizer.param_groups:
+            lr = param_group['lr']
+
     print("lr:",lr)
 
 for epoch in range(start_epoch, start_epoch+50):

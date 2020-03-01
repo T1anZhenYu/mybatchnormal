@@ -41,10 +41,10 @@ class SV_BatchNorm2d(nn.BatchNorm2d):
                 np.savez("./npz/"+str(self.total)+"tempiter",**dic)
             # print("n:",n)
             with torch.no_grad():
-                self.running_mean = exponential_average_factor * mean.mean(dim=0)\
+                self.running_mean = exponential_average_factor * mean\
                     + (1 - exponential_average_factor) * self.running_mean
                 # update running_var with unbiased var
-                self.running_var = exponential_average_factor * var* n / (n - 1)\
+                self.running_var = exponential_average_factor * (var.mean(dim=0))* n / (n - 1)\
                     +(1 - exponential_average_factor) * self.running_var
                 # for i in range(var.size(0)):
                 #     self.running_var = exponential_average_factor * var[i] * n / (n - 1)\

@@ -26,7 +26,7 @@ class SV_BatchNorm2d(nn.BatchNorm2d):
             mean = input.mean([0, 2, 3])
             # print('mean size:', mean.size())
             # use biased var in train
-            var = input.var([2, 3], unbiased=False)
+            var = torch.var(input,[2, 3], unbiased=False)
             # print('variance size:', var.size())
             n = input.numel() / (input.size(1) * input.size(0))
             print("n:",n)

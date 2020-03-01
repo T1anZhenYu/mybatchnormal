@@ -37,9 +37,11 @@ class SV_BatchNorm2d(nn.BatchNorm2d):
                 self.running_mean = exponential_average_factor * mean\
                     + (1 - exponential_average_factor) * self.running_mean
                 # update running_var with unbiased var
-                for i in range(var.size(0)):
-                    self.running_var = exponential_average_factor * var[i] * n / (n - 1)\
-                        + (1 - exponential_average_factor) * self.running_var
+                self.running_var = exponential_average_factor * var.mean(dim=0)*n/(n-1)\
+                    +(1 - exponential_average_factor) * self.running_var
+                # for i in range(var.size(0)):
+                #     self.running_var = exponential_average_factor * var[i] * n / (n - 1)\
+                #         + (1 - exponential_average_factor) * self.running_var
                     # self.running_var = exponential_average_factor * var * n / (n - 1)\
                         # + (1 - exponential_average_factor) * self.running_var
             input = (input - mean[None, :, None, None]) / (torch.sqrt(var[:, :, None, None] + self.eps))

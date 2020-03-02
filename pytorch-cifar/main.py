@@ -183,11 +183,11 @@ def adjust_learning_rate(optimizer, epoch):
     lr_min = 0.0001
     lr_max = 0.1 * args.batch_size / 256
 
-    if epoch <= args.warmp_up:
-        lr = lr_min + 0.5*(lr_max - lr_min)*(1 - math.cos(epoch/(args.warmp_up+1)*math.pi))
+    if epoch <= args.warm_up:
+        lr = lr_min + 0.5*(lr_max - lr_min)*(1 - math.cos(epoch/(args.warm_up+1)*math.pi))
     else :
         lr = lr_min + 0.5*(lr_max - lr_min)*\
-             (1 + math.cos((epoch - args.warmp_up)/(args.epochs - args.warmp_up)*math.pi))
+             (1 + math.cos((epoch - args.warm_up)/(args.epochs - args.warm_up)*math.pi))
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
     return lr

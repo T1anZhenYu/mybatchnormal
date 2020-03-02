@@ -8,7 +8,7 @@ class Detach_mean(nn.BatchNorm2d):
                  affine=True, track_running_stats=True):
         super(Detach_mean, self).__init__(
             num_features, eps, momentum, affine, track_running_stats)
-
+        self.total = 1
     def forward(self, input):
         self._check_input_dim(input)
 

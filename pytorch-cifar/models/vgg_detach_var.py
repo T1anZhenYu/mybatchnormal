@@ -4,7 +4,7 @@ import torch.nn as nn
 
 
 class DetachVar(nn.BatchNorm2d):
-    def __init__(self, num_features, eps=1e-5, momentum=0.1,
+    def __init__(self, num_features, eps=1e-1, momentum=0.1,
                  affine=True, track_running_stats=True):
         super(DetachVar, self).__init__(
             num_features, eps, momentum, affine, track_running_stats)

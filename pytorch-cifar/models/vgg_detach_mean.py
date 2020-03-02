@@ -38,7 +38,7 @@ class Detach_mean(nn.BatchNorm2d):
                 dic = {}
                 dic['var']=var.cpu().detach().numpy()
 
-                np.savez("./detachmeannpz/"+str(self.total)+"tempiter",**dic)
+                np.savez("./npz/"+str(self.total)+"tempiter",**dic)
             # print("n:",n)
             with torch.no_grad():
                 self.running_mean = exponential_average_factor * mean \

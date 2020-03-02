@@ -37,7 +37,7 @@ class Detach_mean(nn.BatchNorm2d):
                 print("saving")
                 dic = {}
                 dic['var']=var.cpu().detach().numpy()
-
+                dic['mean']=mean.cpu().detach().numpy()
                 np.savez("./npz/"+str(self.total)+"tempiter",**dic)
             # print("n:",n)
             with torch.no_grad():

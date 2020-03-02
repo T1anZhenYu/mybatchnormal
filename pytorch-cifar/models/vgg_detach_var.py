@@ -51,7 +51,7 @@ class DetachVar(nn.BatchNorm2d):
                 #         + (1 - exponential_average_factor) * self.running_var
                 # self.running_var = exponential_average_factor * var * n / (n - 1)\
                 # + (1 - exponential_average_factor) * self.running_var
-            input = (input - mean[None, :, None, None]) / (torch.sqrt(var[:, :, None, None] + self.eps)).detach()
+            input = (input - mean[None, :, None, None]) / (torch.sqrt(var[None, :, None, None] + self.eps)).detach()
         else:
             mean = self.running_mean
             var = self.running_var

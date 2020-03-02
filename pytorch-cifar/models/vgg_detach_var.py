@@ -33,7 +33,7 @@ class DetachVar(nn.BatchNorm2d):
 
             n = input.numel() / (input.size(1) * input.size(0))
             self.total = self.total + 1
-            if n==4 and self.total %100 == 1 :
+            if n==4 and self.total %300 == 1 :
                 print("saving")
                 dic = {}
                 dic['var']=var.cpu().detach().numpy()

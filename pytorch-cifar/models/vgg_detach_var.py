@@ -71,9 +71,9 @@ cfg = {
 }
 
 
-class VGG_My_Batch(nn.Module):
+class VGG_DetachVar(nn.Module):
     def __init__(self, vgg_name):
-        super(VGG_My_Batch, self).__init__()
+        super(VGG_DetachVar, self).__init__()
         self.features = self._make_layers(cfg[vgg_name])
         self.classifier = nn.Linear(512, 10)
 

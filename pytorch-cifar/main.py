@@ -68,7 +68,7 @@ elif args.method=='smv_batch':
 elif args.method=='svv_batch':
     net = VGG_SVV_Batch('VGG19')
 elif args.method=='detach_var':
-    net = DetachVar('VGG19')
+    net = VGG_DetachVar('VGG19')
 else:
     raise NotImplementedError
 # net = ResNet18()

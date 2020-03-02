@@ -178,6 +178,8 @@ def test(epoch):
 
 for epoch in range(start_epoch, start_epoch+50):
     scheduler_warmup.step()
+    lr = scheduler_warmup.get_lr()
+    print("lr:",lr)
     train(epoch)
     test(epoch)
 #     scheduler.step()

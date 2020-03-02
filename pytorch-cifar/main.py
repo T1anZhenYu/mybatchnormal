@@ -14,7 +14,7 @@ import argparse
 from models import *
 from utils import progress_bar
 from tensorboardX import SummaryWriter
-
+from warmup_scheduler import GradualWarmupScheduler
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
@@ -67,6 +67,8 @@ elif args.method=='smv_batch':
     net = VGG_SMV_Batch('VGG19')
 elif args.method=='svv_batch':
     net = VGG_SVV_Batch('VGG19')
+elif args.method=='detach_var':
+    net = DetachVar('VGG19')
 else:
     raise NotImplementedError
 # net = ResNet18()
@@ -97,9 +99,9 @@ if args.resume:
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
-scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,
-                                                 milestones=[25,50,75],
-                                                 gamma=0.1)
+scheduler_cosine = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, 80)
+scheduler_warmup = GradualWarmupScheduler(optimizer, multiplier=8, total_epoch=10, after_scheduler=scheduler_cosine)
+
 
 writer = SummaryWriter(args.dir)
 class AutoStep():
@@ -174,27 +176,8 @@ def test(epoch):
         torch.save(state, args.dir+'/ckpt.pth')
         best_acc = acc
 
-        
-        
-def adjust_learning_rate(optimizer, epoch):
-    lr_max = args.lr
-    lr = args.lr
-
-    for param_group in optimizer.param_groups:
-        lr = param_group['lr']
-    if epoch <= 10:
-        lr = 0.0001 + 0.5*lr_max*(1 - math.cos(epoch/(10)*math.pi))
-        for param_group in optimizer.param_groups:
-            param_group['lr'] = lr
-
-    elif epoch in args.schedule:
-        lr *= 0.1
-
-
-    print("lr:",lr)
-
 for epoch in range(start_epoch, start_epoch+50):
-    adjust_learning_rate(optimizer,epoch)
+    scheduler_warmup.step()
     train(epoch)
     test(epoch)
 #     scheduler.step()

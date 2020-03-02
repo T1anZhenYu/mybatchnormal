@@ -24,24 +24,39 @@ class MyBatchNorm2d(nn.BatchNorm2d):
 
         # calculate running estimates
         if self.training:
-            mean = input.mean([0, 2, 3])
+            mean = input.mean(dim=(0, 2, 3), keepdim=True)
             # print('mean size:', mean.size())
             # use biased var in train
-            var = input.var([0, 2, 3], unbiased=False)
-            # print('variance size:', var.size())
-            n = input.numel() / input.size(1)
+            var = (input - mean).pow(2).mean(dim=(0,2, 3), keepdim=True)
+            mean = mean.squeeze()
+            var = var.squeeze()
+
+            n = input.numel() / (input.size(1) * input.size(0))
+            # self.total = self.total + 1
+            # if n==4 and self.total %300 == 1 :
+            #     print("saving")
+            #     dic = {}
+            #     dic['var']=var.cpu().detach().numpy()
+            #
+            #     np.savez("./npz/"+str(self.total)+"tempiter",**dic)
+            # print("n:",n)
             with torch.no_grad():
-                self.running_mean = exponential_average_factor * mean\
-                    + (1 - exponential_average_factor) * self.running_mean
-                # print('running_mean size:', self.running_mean.size())
+                self.running_mean = exponential_average_factor * mean \
+                                    + (1 - exponential_average_factor) * self.running_mean
                 # update running_var with unbiased var
-                self.running_var = exponential_average_factor * var * n / (n - 1)\
-                    + (1 - exponential_average_factor) * self.running_var
+                self.running_var = exponential_average_factor * (var.mean(dim=0)) * n / (n - 1) \
+                                   + (1 - exponential_average_factor) * self.running_var
+                # for i in range(var.size(0)):
+                #     self.running_var = exponential_average_factor * var[i] * n / (n - 1)\
+                #         + (1 - exponential_average_factor) * self.running_var
+                # self.running_var = exponential_average_factor * var * n / (n - 1)\
+                # + (1 - exponential_average_factor) * self.running_var
+            input = (input - mean[None, :, None, None]) / (torch.sqrt(var[None, :, None, None] + self.eps))
         else:
             mean = self.running_mean
             var = self.running_var
+            input = (input - mean[None, :, None, None]) / (torch.sqrt(var[None, :, None, None] + self.eps))
 
-        input = (input - mean[None, :, None, None]) / (torch.sqrt(var[None, :, None, None] + self.eps))
         if self.affine:
             input = input * self.weight[None, :, None, None] + self.bias[None, :, None, None]
 

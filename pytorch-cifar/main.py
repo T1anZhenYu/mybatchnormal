@@ -93,6 +93,7 @@ else:
 # net = ShuffleNetV2(1)
 # net = EfficientNetB0()
 net = torch.nn.DataParallel(net).cuda()
+device = 'cuda'
 # if device == 'cuda':
 #     net = torch.nn.DataParallel(net)
 #     cudnn.benchmark = True

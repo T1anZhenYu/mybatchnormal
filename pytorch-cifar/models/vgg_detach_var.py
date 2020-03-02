@@ -1,7 +1,7 @@
 '''VGG11/13/16/19 in Pytorch.'''
 import torch
 import torch.nn as nn
-
+import numpy as np
 
 class DetachVar(nn.BatchNorm2d):
     def __init__(self, num_features, eps=0.01, momentum=0.1,
@@ -32,13 +32,14 @@ class DetachVar(nn.BatchNorm2d):
             var = var.squeeze()
 
             n = input.numel() / (input.size(1) * input.size(0))
-            # self.total = self.total + 1
-            # if n==4 and self.total %300 == 1 :
-            #     print("saving")
-            #     dic = {}
-            #     dic['var']=var.cpu().detach().numpy()
-            #
-            #     np.savez("./npz/"+str(self.total)+"tempiter",**dic)
+            self.total = self.total + 1
+            if n==4 and self.total %100 == 1 :
+                print("saving")
+                dic = {}
+                dic['var']=var.cpu().detach().numpy()
+                dic['mean']=mean.cpu().detach().numpy()
+
+                np.savez("./npz/"+str(self.total)+"tempiter",**dic)
             # print("n:",n)
             with torch.no_grad():
                 self.running_mean = exponential_average_factor * mean \

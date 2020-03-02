@@ -26,11 +26,17 @@ parser.add_argument('--dir', type=str, help='root dir')
 parser.add_argument('--method', type=str, help='batch normal')
 parser.add_argument('--schedule', type=int, nargs='+', default=[25,50,75],
                         help='Decrease learning rate at these epochs.')
+parser.add_argument('--gpu-id', default='0', type=str,
+                    help='id(s) for CUDA_VISIBLE_DEVICES')
 args = parser.parse_args()
 
 os.makedirs(args.dir, exist_ok=True)
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
+os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_id
+use_cuda = torch.cuda.is_available()
+print('current gpu:')
+print(torch.cuda.current_device())
+print("Let's use", torch.cuda.device_count(), "GPUs!\n")
 best_acc = 0  # best test accuracy
 start_epoch = 0  # start from epoch 0 or last checkpoint epoch
 

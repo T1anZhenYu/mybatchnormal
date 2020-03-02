@@ -79,6 +79,8 @@ elif args.method=='detach_l2':
     net = VGG_DetachL2('VGG19')
 elif args.method == 'detach_mean':
     net = VGG_Detach_mean('VGG19')
+elif args.method == 'detach_clip_l2':
+    net = VGG_DetachClipL2('VGG19')
 elif args.method == 'detach_clip_var':
     net = VGG_DetachClipVar('VGG19')
 else:

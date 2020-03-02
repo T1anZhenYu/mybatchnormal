@@ -18,6 +18,7 @@ from warmup_scheduler import GradualWarmupScheduler
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
+parser.add_argument('--warm_up', default=10, type=int, help='warm up')
 parser.add_argument('--resume', '-r', action='store_true', help='resume from checkpoint')
 parser.add_argument('--dir', type=str, help='root dir')
 parser.add_argument('--method', type=str, help='batch normal')
@@ -175,10 +176,21 @@ def test(epoch):
             os.mkdir('checkpoint')
         torch.save(state, args.dir+'/ckpt.pth')
         best_acc = acc
+def adjust_learning_rate(optimizer, epoch):
 
+    lr_min = 0.0001
+    lr_max = 0.1 * args.train_batch / 256
+
+    if epoch <= args.warmp_up:
+        lr = lr_min + 0.5*(lr_max - lr_min)*(1 - math.cos(epoch/(args.ramp_up+1)*math.pi))
+    else :
+        lr = lr_min + 0.5*(lr_max - lr_min)*\
+             (1 + math.cos((epoch - args.ramp_up)/(args.epochs - args.ramp_up)*math.pi))
+    for param_group in optimizer.param_groups:
+        param_group['lr'] = lr
+    return lr
 for epoch in range(start_epoch, start_epoch+50):
-    scheduler_warmup.step()
-    lr = scheduler_warmup.get_lr()
+    lr = adjust_learning_rate(optimizer,epoch)
     print("lr:",lr)
     train(epoch)
     test(epoch)

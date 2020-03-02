@@ -28,7 +28,7 @@ class DetachClipVar(nn.BatchNorm2d):
             # print('mean size:', mean.size())
             # use biased var in train
             var = (input - mean).pow(2).mean(dim=(0,2, 3), keepdim=True)
-            var = torch.clamp(var,0.1,4)
+            var = torch.clamp(var,min=0.1,max=4)
             mean = mean.squeeze()
             var = var.squeeze()
 

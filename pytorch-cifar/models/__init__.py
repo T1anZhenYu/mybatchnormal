@@ -21,3 +21,4 @@ from .mobilenetv2 import *
 from .efficientnet import *
 from .vgg_detach_var import *
 from .vgg_detach_l2 import *
+from .vgg_detach_mean import *

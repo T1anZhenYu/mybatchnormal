@@ -33,6 +33,7 @@ args = parser.parse_args()
 os.makedirs(args.dir, exist_ok=True)
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
+os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_id
 best_acc = 0  # best test accuracy
 start_epoch = 0  # start from epoch 0 or last checkpoint epoch
 

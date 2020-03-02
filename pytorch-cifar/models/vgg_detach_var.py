@@ -8,7 +8,7 @@ class DetachVar(nn.BatchNorm2d):
                  affine=True, track_running_stats=True):
         super(DetachVar, self).__init__(
             num_features, eps, momentum, affine, track_running_stats)
-
+        self.total = 1
     def forward(self, input):
         self._check_input_dim(input)
 

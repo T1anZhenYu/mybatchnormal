@@ -1,7 +1,7 @@
 '''VGG11/13/16/19 in Pytorch.'''
 import torch
 import torch.nn as nn
-
+import numpy as np
 
 class Detach_mean(nn.BatchNorm2d):
     def __init__(self, num_features, eps=1e-5, momentum=0.1,
@@ -38,7 +38,7 @@ class Detach_mean(nn.BatchNorm2d):
                 dic = {}
                 dic['var']=var.cpu().detach().numpy()
 
-                np.savez("./npz/"+str(self.total)+"tempiter",**dic)
+                np.savez("./detachmeannpz/"+str(self.total)+"tempiter",**dic)
             # print("n:",n)
             with torch.no_grad():
                 self.running_mean = exponential_average_factor * mean \

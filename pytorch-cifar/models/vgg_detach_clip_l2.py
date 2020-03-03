@@ -32,7 +32,7 @@ class DetachClipL2(nn.BatchNorm2d):
             mean = mean.squeeze()
             var = var.squeeze()
 
-            n = input.numel() / (input.size(1) * input.size(0))
+            n = input.numel() / (input.size(1) )
             # self.total = self.total + 1
             # if n==4 and self.total %300 == 1 :
             #     print("saving")

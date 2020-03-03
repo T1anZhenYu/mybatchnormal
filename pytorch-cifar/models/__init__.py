@@ -26,3 +26,4 @@ from .vgg_detach_mean import *
 from .vgg_detach_clip_l2 import *
 from .vgg_detach_clip_var import *
 from .vgg_detach_clip_mean import *
+from .vgg_grad_my_batch import *

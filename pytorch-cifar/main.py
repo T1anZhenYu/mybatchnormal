@@ -85,6 +85,8 @@ elif args.method == 'detach_clip_var':
     net = VGG_DetachClipVar('VGG19')
 elif args.method == 'detach_clip_mean':
     net = VGG_Detach_Clip_Mean('VGG19')
+elif args.method == 'grad_my_batch':
+    net = VGG_Grad_My_Batch('VGG19')
 else:
     raise NotImplementedError
 # net = ResNet18()

@@ -2,7 +2,7 @@
 import torch
 import torch.nn as nn
 
-from ..mynorm import *
+from .mynorm import *
 class MyBatchNorm(nn.BatchNorm2d):
     def __init__(self, num_features, eps=1e-5, momentum=0.1,
                  affine=True, track_running_stats=True):

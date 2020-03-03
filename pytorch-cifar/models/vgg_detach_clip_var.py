@@ -29,7 +29,6 @@ class BatchNormFunction(torch.autograd.Function):
     def backward(ctx, grad_output):
         eps = ctx.eps
         y, var= ctx.saved_variables
-
         g = grad_output
         # print("g:",g[:,0,:,:])
         # gy = (g * y).mean(dim=(0,2,3),keepdim=True)*y
@@ -45,7 +44,7 @@ class BatchNormFunction(torch.autograd.Function):
         return gx, None,None,None,None
 
 class GradBatchNorm(nn.BatchNorm2d):
-    def __init__(self, num_features, eps=1e-5, momentum=0.1,
+    def __init__(self, num_features, eps=0.01, momentum=0.1,
                  affine=False, track_running_stats=True):
         super(GradBatchNorm, self).__init__(
             num_features, eps, momentum, affine, track_running_stats)

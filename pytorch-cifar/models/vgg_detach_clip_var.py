@@ -37,7 +37,7 @@ class BatchNormFunction(torch.autograd.Function):
         # print("gy:",gy[:,0,:,:])
         g1 = g.mean(dim=(0,2,3),keepdim=True)
         # print("g1:",g1[:,0,:,:])
-        gx_ = g -g1
+        gx_ = g - g1
         # print("g - g1",(g-g1)[:,0,:,:])
         # print("gx_:",gx_[:,0,:,:])
         gx = 1. / torch.sqrt(var[None, :, None, None] + eps) * (gx_)

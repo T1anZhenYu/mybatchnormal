@@ -25,7 +25,7 @@ class Detach_Clip_Mean(nn.BatchNorm2d):
         # calculate running estimates
         if self.training:
             mean = (input.mean(dim=(0, 2, 3), keepdim=True)).detach()
-            torch.clamp(mean,min=0,max=3)
+            torch.clamp(mean,min=-0.05,max=3)
             # print('mean size:', mean.size())
             # use biased var in train
             var = (input-mean).pow(2).mean(dim=(0,2, 3), keepdim=True)

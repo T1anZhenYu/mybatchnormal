@@ -69,3 +69,5 @@ class GradBatchNorm(nn.BatchNorm2d):
         if self.affine:
             y = y * self.weight[None, :, None, None] + self.bias[None, :, None, None]
         return y
+
+

@@ -3,14 +3,58 @@ import torch
 import torch.nn as nn
 import numpy as np
 
-class Detach_Clip_Mean(nn.BatchNorm2d):
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+
+class BatchNormFunction(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, x,running_mean,running_var, eps, momentum):
+        mean = x.mean(dim=(0, 2, 3), keepdim=True)
+        # print('mean size:', mean.size())
+        # use biased var in train
+        var = (x - mean).pow(2).mean(dim=(0, 2, 3), keepdim=True)
+        mean = mean.squeeze()
+        var = var.squeeze()
+        n = x.numel() / (x.size(1))
+
+        running_mean.copy_(momentum * mean\
+                            + (1 - momentum) * running_mean)
+        # update running_var with unbiased var
+        running_var.copy_(momentum * var * n / (n - 1) \
+                           + (1 - momentum) * running_var)
+        y = (x - mean[None, :, None, None]) / (torch.sqrt(var[None, :, None, None] + eps))
+        ctx.eps = eps
+        ctx.save_for_backward(y, var, )
+        return y
+
+    @staticmethod
+    def backward(ctx, grad_output):
+        eps = ctx.eps
+        y, var= ctx.saved_variables
+
+        g = grad_output
+        # print("g:",g[:,0,:,:])
+        gy = (g * y).mean(dim=(0,2,3),keepdim=True)*y
+        # print("g*y",(g * y).mean(dim=(0,2,3),keepdim=True)[:,0,:,:])
+        # print("gy:",gy[:,0,:,:])
+        # g1 = g.mean(dim=(0,2,3),keepdim=True)
+        # print("g1:",g1[:,0,:,:])
+        gx_ = g -gy
+        # print("g - g1",(g-g1)[:,0,:,:])
+        # print("gx_:",gx_[:,0,:,:])
+        gx = 1. / torch.sqrt(var[None, :, None, None] + eps) * (gx_)
+        # print("gx:",gx[:,0,:,:])
+        return gx, None,None,None,None
+
+class GradBatchNorm(nn.BatchNorm2d):
     def __init__(self, num_features, eps=1e-5, momentum=0.1,
-                 affine=True, track_running_stats=True):
-        super(Detach_Clip_Mean, self).__init__(
+                 affine=False, track_running_stats=True):
+        super(GradBatchNorm, self).__init__(
             num_features, eps, momentum, affine, track_running_stats)
-        self.total = 1
-    def forward(self, input):
-        self._check_input_dim(input)
+    def forward(self,x):
+        self._check_input_dim(x)
 
         exponential_average_factor = 0.0
 
@@ -21,47 +65,15 @@ class Detach_Clip_Mean(nn.BatchNorm2d):
                     exponential_average_factor = 1.0 / float(self.num_batches_tracked)
                 else:  # use exponential moving average
                     exponential_average_factor = self.momentum
-
-        # calculate running estimates
         if self.training:
-            mean = (input.mean(dim=(0, 2, 3), keepdim=True)).detach()
-            torch.clamp(mean,min=-0.1,max=3)
-            # print('mean size:', mean.size())
-            # use biased var in train
-            var = (input-mean).pow(2).mean(dim=(0,2, 3), keepdim=True)
-            mean = mean.squeeze()
-            var = var.squeeze()
-
-            n = input.numel() / (input.size(1) )
-            # self.total = self.total + 1
-            # if n==4 and self.total %300 == 1 :
-            #     print("saving")
-            #     dic = {}
-            #     dic['var']=var.cpu().detach().numpy()
-            #     dic['mean']=mean.cpu().detach().numpy()
-            #     np.savez("./npz/"+str(self.total)+"tempiter",**dic)
-            # print("n:",n)
-            with torch.no_grad():
-                self.running_mean = exponential_average_factor * mean \
-                                    + (1 - exponential_average_factor) * self.running_mean
-                # update running_var with unbiased var
-                self.running_var = exponential_average_factor * (var) * n / (n - 1) \
-                                   + (1 - exponential_average_factor) * self.running_var
-                # for i in range(var.size(0)):
-                #     self.running_var = exponential_average_factor * var[i] * n / (n - 1)\
-                #         + (1 - exponential_average_factor) * self.running_var
-                # self.running_var = exponential_average_factor * var * n / (n - 1)\
-                # + (1 - exponential_average_factor) * self.running_var
-            input = (input - (mean[None, :, None, None])) / (torch.sqrt(var[None, :, None, None] + self.eps))
+            y = BatchNormFunction.apply(x,self.running_mean,self.running_var,self.eps,exponential_average_factor)
         else:
             mean = self.running_mean
             var = self.running_var
-            input = (input - mean[None, :, None, None]) / (torch.sqrt(var[None, :, None, None] + self.eps))
-
+            y = (x - mean[None, :, None, None]) / (torch.sqrt(var[None, :, None, None] + self.eps))
         if self.affine:
-            input = input * self.weight[None, :, None, None] + self.bias[None, :, None, None]
-
-        return input
+            y = y * self.weight[None, :, None, None] + self.bias[None, :, None, None]
+        return y
 
 
 cfg = {
@@ -92,7 +104,7 @@ class VGG_Detach_Clip_Mean(nn.Module):
                 layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
             else:
                 layers += [nn.Conv2d(in_channels, x, kernel_size=3, padding=1),
-                           Detach_Clip_Mean(x),
+                           GradBatchNorm(x),
                            nn.ReLU(inplace=True)]
                 in_channels = x
         layers += [nn.AvgPool2d(kernel_size=1, stride=1)]

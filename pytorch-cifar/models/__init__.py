@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from .vgg import *
 from .vgg_my_batch import *
 from .vgg_sm_batch import *

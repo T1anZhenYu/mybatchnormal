@@ -36,7 +36,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_id
 best_acc = 0  # best test accuracy
 start_epoch = 0  # start from epoch 0 or last checkpoint epoch
-
+torch.autograd.set_detect_anomaly(True)
 # Data
 print('==> Preparing data..')
 transform_train = transforms.Compose([

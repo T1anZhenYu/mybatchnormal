@@ -24,7 +24,7 @@ class Detach_mean(nn.BatchNorm2d):
 
         # calculate running estimates
         if self.training:
-            mean = (input.mean(dim=(0, 2, 3), keepdim=True)).detach()
+            mean = (input.mean(dim=(0, 2, 3), keepdim=True))
             # print('mean size:', mean.size())
             # use biased var in train
             var = (input-mean).pow(2).mean(dim=(0,2, 3), keepdim=True)
@@ -51,7 +51,7 @@ class Detach_mean(nn.BatchNorm2d):
                 #         + (1 - exponential_average_factor) * self.running_var
                 # self.running_var = exponential_average_factor * var * n / (n - 1)\
                 # + (1 - exponential_average_factor) * self.running_var
-            input = (input - (mean[None, :, None, None])) / (torch.sqrt(var[None, :, None, None] + self.eps))
+            input = (input - (mean[None, :, None, None]).detach()) / (torch.sqrt(var[None, :, None, None] + self.eps))
         else:
             mean = self.running_mean
             var = self.running_var

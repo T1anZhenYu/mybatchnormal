@@ -14,7 +14,7 @@ import argparse
 from models import *
 from utils import progress_bar
 from tensorboardX import SummaryWriter
-from warmup_scheduler import GradualWarmupScheduler
+
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
@@ -118,7 +118,7 @@ if args.resume:
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
 scheduler_cosine = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, 80)
-scheduler_warmup = GradualWarmupScheduler(optimizer, multiplier=8, total_epoch=10, after_scheduler=scheduler_cosine)
+# scheduler_warmup = GradualWarmupScheduler(optimizer, multiplier=8, total_epoch=10, after_scheduler=scheduler_cosine)
 
 
 writer = SummaryWriter(args.dir)

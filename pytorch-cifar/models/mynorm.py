@@ -13,12 +13,12 @@ class BatchNormFunction(torch.autograd.Function):
         mean = mean.squeeze()
         var = var.squeeze()
         n = x.numel() / (x.size(1))
-        with torch.no_grad():
-            running_mean.copy_(momentum * mean\
-                                + (1 - momentum) * running_mean)
-            # update running_var with unbiased var
-            running_var.copy_(momentum * var * n / (n - 1) \
-                               + (1 - momentum) * running_var)
+
+        running_mean.copy_(momentum * mean\
+                            + (1 - momentum) * running_mean)
+        # update running_var with unbiased var
+        running_var.copy_(momentum * var * n / (n - 1) \
+                           + (1 - momentum) * running_var)
         y = (x - mean[None, :, None, None]) / (torch.sqrt(var[None, :, None, None] + eps))
         ctx.eps = eps
         ctx.save_for_backward(x,y, var, )

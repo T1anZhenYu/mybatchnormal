@@ -21,13 +21,13 @@ class BatchNormFunction(torch.autograd.Function):
                                + (1 - momentum) * running_var)
         y = (x - mean[None, :, None, None]) / (torch.sqrt(var[None, :, None, None] + eps))
         ctx.eps = eps
-        ctx.save_for_backward(y, var, )
+        ctx.save_for_backward(x,y, var, )
         return y
 
     @staticmethod
     def backward(ctx, grad_output):
         eps = ctx.eps
-        y, var= ctx.saved_variables
+        x,y, var= ctx.saved_variables
 
         g = grad_output
         # print("g:",g[:,0,:,:])

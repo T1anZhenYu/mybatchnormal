@@ -43,10 +43,10 @@ class BatchNormFunction(torch.autograd.Function):
         # print("gx:",gx[:,0,:,:])
         return gx, None,None,None,None
 
-class MyBatchNorm(nn.BatchNorm2d):
+class GradBatchNorm(nn.BatchNorm2d):
     def __init__(self, num_features, eps=1e-5, momentum=0.1,
                  affine=False, track_running_stats=True):
-        super(MyBatchNorm, self).__init__(
+        super(GradBatchNorm, self).__init__(
             num_features, eps, momentum, affine, track_running_stats)
     def forward(self,x):
         self._check_input_dim(x)

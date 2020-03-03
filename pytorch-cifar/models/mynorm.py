@@ -61,11 +61,11 @@ class GradBatchNorm(nn.BatchNorm2d):
                 else:  # use exponential moving average
                     exponential_average_factor = self.momentum
         if self.training:
-            x = BatchNormFunction.apply(x,self.running_mean,self.running_var,self.eps,exponential_average_factor)
+            y = BatchNormFunction.apply(x,self.running_mean,self.running_var,self.eps,exponential_average_factor)
         else:
             mean = self.running_mean
             var = self.running_var
-            x = (x - mean[None, :, None, None]) / (torch.sqrt(var[None, :, None, None] + self.eps))
+            y = (x - mean[None, :, None, None]) / (torch.sqrt(var[None, :, None, None] + self.eps))
         if self.affine:
-            x = x * self.weight[None, :, None, None] + self.bias[None, :, None, None]
-        return x
+            y = y * self.weight[None, :, None, None] + self.bias[None, :, None, None]
+        return y

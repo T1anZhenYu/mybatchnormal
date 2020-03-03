@@ -12,6 +12,7 @@ class BatchNormFunction(torch.autograd.Function):
     @staticmethod
     def forward(ctx, x,running_mean,running_var, eps, momentum):
         mean = x.mean(dim=(0, 2, 3), keepdim=True)
+        mean = torch.clamp(mean,min=0,max=4)
         # print('mean size:', mean.size())
         # use biased var in train
         var = (x - mean).pow(2).mean(dim=(0, 2, 3), keepdim=True)

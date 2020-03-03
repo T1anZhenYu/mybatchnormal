@@ -161,7 +161,7 @@ class VGG_DetachClipVar(nn.Module):
             else:
                 layers += [nn.Conv2d(in_channels, x, kernel_size=3, padding=1),
                            GradBatchNorm(x),
-                           nn.ReLU(inplace=True)]
+                           nn.ReLU(inplace=False)]
                 in_channels = x
         layers += [nn.AvgPool2d(kernel_size=1, stride=1)]
         return nn.Sequential(*layers)
